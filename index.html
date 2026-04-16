@@ -18,12 +18,17 @@ body{
  min-height:100vh;
 }
 
+/* SIDEBAR */
 .sidebar{
  width:300px;
  background:#0a0f1d;
  border-right:1px solid #1f2937;
  padding:12px;
  overflow-y:auto;
+}
+
+.sidebar h3{
+ margin:0 0 10px 0;
 }
 
 .app{
@@ -36,8 +41,11 @@ body{
  font-size:13px;
 }
 
-.app.active{border-color:#22c55e;}
+.app.active{
+ border-color:#22c55e;
+}
 
+/* MAIN */
 .main{
  flex:1;
  padding:14px;
@@ -59,6 +67,11 @@ body{
  border:1px solid #1f2937;
 }
 
+h2{
+ font-size:16px;
+ margin:0 0 10px 0;
+}
+
 p{
  font-size:13px;
  line-height:1.6;
@@ -77,6 +90,11 @@ select{
  padding:6px;
  border-radius:6px;
 }
+
+.value{
+ font-weight:bold;
+ color:#22c55e;
+}
 </style>
 </head>
 
@@ -84,9 +102,9 @@ select{
 
 <div class="layout">
 
-<!-- NAV -->
+<!-- SIDEBAR NAV -->
 <div class="sidebar">
-<h3>AI Apps</h3>
+<h3>AI Medical Apps</h3>
 <div id="nav"></div>
 </div>
 
@@ -94,7 +112,7 @@ select{
 <div class="main">
 
 <div class="card">
-<label>Tier:</label>
+<label>Development Tier:</label>
 <select id="tier" onchange="render()">
 <option value="3">$3K MVP</option>
 <option value="7" selected>$7K Product</option>
@@ -110,18 +128,98 @@ select{
 
 <script>
 
-/* FULL DATASET (LOCKED) */
+/* ================= FULL LOCKED DATASET ================= */
 const apps=[
-{name:"AI Clinical Documentation",what:"AI converts doctor-patient conversations into structured medical documentation.",how:"Speech-to-text → NLP → SOAP notes → EHR.",why:"Doctors spend up to 60% on documentation.",gtm:"Clinics → hospitals.",baseClinic:50,baseRevenue:800},
-{name:"Remote Patient Monitoring",what:"Continuous patient monitoring system.",how:"Devices → AI → alerts.",why:"Events happen outside hospitals.",gtm:"Elderly care.",baseClinic:80,baseRevenue:600},
-{name:"AI Intake Triage",what:"Pre-screen patients.",how:"AI routes cases.",why:"Improves efficiency.",gtm:"Urgent care.",baseClinic:60,baseRevenue:500},
-{name:"Billing Optimization AI",what:"Finds missed billing.",how:"Scans records.",why:"Hospitals lose revenue.",gtm:"CFOs.",baseClinic:40,baseRevenue:1200},
-{name:"Compliance Monitoring AI",what:"Tracks compliance.",how:"Log analysis.",why:"Avoid penalties.",gtm:"Enterprise.",baseClinic:30,baseRevenue:1500},
-{name:"Staff Scheduling AI",what:"Optimizes staffing.",how:"Forecasting.",why:"Reduce costs.",gtm:"Ops teams.",baseClinic:70,baseRevenue:700},
-{name:"Hospital Analytics Dashboard",what:"Real-time insights.",how:"Data aggregation.",why:"Better decisions.",gtm:"Leadership.",baseClinic:20,baseRevenue:2500},
-{name:"AI Patient CRM",what:"Retention system.",how:"Automation.",why:"Increase LTV.",gtm:"Clinics.",baseClinic:90,baseRevenue:400},
-{name:"Drug Interaction AI",what:"Detects risks.",how:"Prescription analysis.",why:"Avoid errors.",gtm:"Doctors.",baseClinic:100,baseRevenue:300},
-{name:"Telehealth AI",what:"Virtual care AI.",how:"AI consult + docs.",why:"Scale telehealth.",gtm:"Startups.",baseClinic:60,baseRevenue:900}
+{
+name:"AI Clinical Documentation",
+what:"AI converts doctor-patient conversations into structured medical documentation.",
+how:"Speech-to-text → NLP → SOAP notes → EHR integration.",
+why:"Doctors spend up to 60% of their time on documentation instead of care.",
+gtm:"Start with clinics and hospice networks, then expand into hospitals.",
+baseClinic:50,
+baseRevenue:800
+},
+{
+name:"Remote Patient Monitoring",
+what:"Continuous monitoring of patient health outside hospitals.",
+how:"IoT devices send data → AI detects anomalies → alerts.",
+why:"Most medical issues occur outside hospital supervision.",
+gtm:"Elderly care and post-acute providers.",
+baseClinic:80,
+baseRevenue:600
+},
+{
+name:"AI Intake Triage",
+what:"Pre-visit AI system to assess patient urgency.",
+how:"Patients submit symptoms → AI evaluates → routes care.",
+why:"Reduces overload from non-critical patients.",
+gtm:"Urgent care clinics.",
+baseClinic:60,
+baseRevenue:500
+},
+{
+name:"Billing Optimization AI",
+what:"Identifies missed billing opportunities.",
+how:"Analyzes records vs billing codes.",
+why:"Hospitals lose millions due to underbilling.",
+gtm:"Hospital finance departments.",
+baseClinic:40,
+baseRevenue:1200
+},
+{
+name:"Compliance Monitoring AI",
+what:"Tracks healthcare compliance automatically.",
+how:"Scans logs → flags violations.",
+why:"Prevents fines and legal issues.",
+gtm:"Enterprise hospitals.",
+baseClinic:30,
+baseRevenue:1500
+},
+{
+name:"Staff Scheduling AI",
+what:"Optimizes workforce scheduling.",
+how:"Forecasts demand → balances staffing.",
+why:"Reduces labor costs significantly.",
+gtm:"Hospital operations teams.",
+baseClinic:70,
+baseRevenue:700
+},
+{
+name:"Hospital Analytics Dashboard",
+what:"Real-time hospital performance insights.",
+how:"Aggregates operational and financial data.",
+why:"Improves executive decision-making.",
+gtm:"Hospital leadership.",
+baseClinic:20,
+baseRevenue:2500
+},
+{
+name:"AI Patient CRM",
+what:"Patient engagement and retention system.",
+how:"Automates messaging and follow-ups.",
+why:"Improves lifetime value.",
+gtm:"Private clinics.",
+baseClinic:90,
+baseRevenue:400
+},
+{
+name:"Drug Interaction AI",
+what:"Detects harmful drug combinations.",
+how:"Analyzes prescriptions instantly.",
+why:"Reduces medical errors and liability.",
+gtm:"Doctors and pharmacies.",
+baseClinic:100,
+baseRevenue:300
+},
+{
+name:"Telehealth AI",
+what:"AI-powered virtual consultation assistant.",
+how:"Handles intake, conversation, documentation.",
+why:"Scales telehealth efficiently.",
+gtm:"Telemedicine startups.",
+baseClinic:60,
+baseRevenue:900
+}
 ];
 
 let selected=0;
@@ -141,13 +239,13 @@ function selectApp(i){
  render();
 }
 
-/* MULTIPLIER */
+/* TIER MULTIPLIER */
 function getMultiplier(){
  let t=+document.getElementById("tier").value;
- return t===3?0.6:t===7?1:t===12?1.5:1;
+ return t===3?0.6:t===7?1:1.5;
 }
 
-/* RENDER */
+/* MAIN RENDER */
 function render(){
 
  renderNav();
@@ -170,10 +268,10 @@ function render(){
 
 <div class="section">
 
-<p><b>Facilities: <span id="facVal">${Math.round(a.baseClinic)}</span></b></p>
+<p>Facilities: <span class="value" id="facVal">${a.baseClinic}</span></p>
 <input type="range" min="10" max="500" value="${a.baseClinic}" id="fac" oninput="calc()">
 
-<p><b>Revenue per facility: $<span id="revVal">${a.baseRevenue}</span></b></p>
+<p>Revenue per facility: $<span class="value" id="revVal">${a.baseRevenue}</span></p>
 <input type="range" min="100" max="3000" value="${a.baseRevenue}" id="rev" oninput="calc()">
 
 <p id="profit" style="margin-top:10px;"></p>
@@ -196,10 +294,12 @@ function calc(){
  let r=+document.getElementById("rev").value;
  let m=getMultiplier();
 
- document.getElementById("facVal").innerText=Math.round(f*m);
- document.getElementById("revVal").innerText=Math.round(r*m);
+ let fAdj=Math.round(f*m);
+ let rAdj=Math.round(r*m);
+ let total=fAdj*rAdj;
 
- let total=Math.round(f*m)*Math.round(r*m);
+ document.getElementById("facVal").innerText=fAdj;
+ document.getElementById("revVal").innerText=rAdj;
 
  document.getElementById("profit").innerHTML=
  "<b>Total Monthly Revenue: $"+total.toLocaleString()+"</b>";
