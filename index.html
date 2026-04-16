@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Medical Investment System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+ margin:0;
+ font-family:Arial;
+ background:#0b0f1a;
+ color:#e5e7eb;
+}
+
+.layout{
+ display:flex;
+ min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+ width:300px;
+ background:#0a0f1d;
+ border-right:1px solid #1f2937;
+ padding:12px;
+ overflow-y:auto;
+}
+
+.app{
+ padding:10px;
+ margin:6px 0;
+ border-radius:8px;
+ border:1px solid #1f2937;
+ cursor:pointer;
+ background:#111827;
+ font-size:13px;
+}
+
+.app.active{
+ border-color:#22c55e;
+}
+
+/* MAIN */
+.main{
+ flex:1;
+ padding:14px;
+}
+
+.card{
+ background:#111827;
+ border:1px solid #1f2937;
+ border-radius:12px;
+ padding:12px;
+ margin-bottom:12px;
+}
+
+.section{
+ margin-top:10px;
+ padding:10px;
+ border-radius:8px;
+ background:#0b1220;
+ border:1px solid #1f2937;
+}
+
+h2{font-size:16px;margin:0 0 10px 0;}
+
+p{
+ font-size:13px;
+ line-height:1.6;
+ opacity:0.9;
+ margin:6px 0;
+}
+
+select{
+ background:#0b1220;
+ color:white;
+ border:1px solid #1f2937;
+ padding:6px;
+ border-radius:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR NAV -->
+<div class="sidebar">
+<h3>AI Medical Apps</h3>
+<div id="nav"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="card">
+<label>Tier Model:</label>
+<select id="tier" onchange="render()">
+<option value="3">$3K MVP</option>
+<option value="7" selected>$7K Product</option>
+<option value="12">$12K Enterprise</option>
+</select>
+</div>
+
+<div id="view"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* ================= LOCKED DATASET (NEVER REDUCE) ================= */
+const apps=[
+{
+name:"AI Clinical Documentation",
+what:"AI converts doctor-patient conversations into structured medical documentation.",
+how:"Speech-to-text → NLP processing → SOAP note generation → EHR export.",
+why:"Doctors spend up to 60% of time on documentation instead of patient care.",
+gtm:"Start with clinics and hospice networks, then expand into hospital systems.",
+baseClinic:50,
+baseRevenue:800
+},
+{
+name:"Remote Patient Monitoring",
+what:"Continuous AI system that monitors patient health outside hospitals.",
+how:"IoT devices stream data → AI detects anomalies → alerts are triggered.",
+why:"Most critical health events occur outside hospitals without monitoring.",
+gtm:"Elderly care facilities and post-acute providers first.",
+baseClinic:80,
+baseRevenue:600
+},
+{
+name:"AI Intake Triage",
+what:"Pre-visit AI system that evaluates patient urgency.",
+how:"Patient inputs symptoms → AI classifies urgency → routes care.",
+why:"Clinics waste capacity on non-urgent cases.",
+gtm:"Urgent care chains and outpatient clinics.",
+baseClinic:60,
+baseRevenue:500
+},
+{
+name:"Billing Optimization AI",
+what:"Detects missed or undercoded billing opportunities.",
+how:"Scans medical records → maps procedures → finds revenue gaps.",
+why:"Hospitals lose millions due to underbilling.",
+gtm:"Hospital CFOs and revenue cycle departments.",
+baseClinic:40,
+baseRevenue:1200
+},
+{
+name:"Compliance Monitoring AI",
+what:"Automated compliance tracking system.",
+how:"Continuously scans logs and detects violations.",
+why:"Compliance failures create legal and financial risk.",
+gtm:"Enterprise hospital systems.",
+baseClinic:30,
+baseRevenue:1500
+},
+{
+name:"Staff Scheduling AI",
+what:"Optimizes hospital workforce scheduling.",
+how:"Predicts demand + balances staff availability.",
+why:"Hospitals overspend heavily on inefficient staffing.",
+gtm:"Hospital operations teams.",
+baseClinic:70,
+baseRevenue:700
+},
+{
+name:"Hospital Analytics Dashboard",
+what:"Real-time operational intelligence platform.",
+how:"Aggregates clinical + financial + operational data.",
+why:"Executives lack real-time decision visibility.",
+gtm:"Hospital leadership teams.",
+baseClinic:20,
+baseRevenue:2500
+},
+{
+name:"AI Patient CRM",
+what:"Automated patient engagement and retention system.",
+how:"Messaging + reminders + segmentation automation.",
+why:"Retention drives long-term healthcare revenue.",
+gtm:"Private clinics and outpatient networks.",
+baseClinic:90,
+baseRevenue:400
+},
+{
+name:"Drug Interaction AI",
+what:"Real-time medication safety detection system.",
+how:"Analyzes prescriptions and flags dangerous combinations.",
+why:"Medication errors are a major liability risk.",
+gtm:"Pharmacies and prescribing doctors.",
+baseClinic:100,
+baseRevenue:300
+},
+{
+name:"Telehealth AI",
+what:"AI-powered virtual consultation assistant.",
+how:"Handles intake, conversation, and documentation.",
+why:"Telehealth scaling is limited by human labor.",
+gtm:"Telemedicine companies and digital health startups.",
+baseClinic:60,
+baseRevenue:900
+}
+];
+
+/* STATE */
+let selected=0;
+
+/* NAV RENDER */
+function renderNav(){
+ let html="";
+ apps.forEach((a,i)=>{
+  html+=`<div class="app ${i===selected?'active':''}" onclick="selectApp(${i})">${a.name}</div>`;
+ });
+ document.getElementById("nav").innerHTML=html;
+}
+
+/* SELECT */
+function selectApp(i){
+ selected=i;
+ render();
+}
+
+/* TIER */
+function getTier(){
+ return +document.getElementById("tier").value;
+}
+
+/* VIEW */
+function render(){
+
+ renderNav();
+
+ let a=apps[selected];
+ let t=getTier();
+
+ let m = t===3?0.6:t===7?1.0:1.5;
+
+ let clinics=Math.round(a.baseClinic*m);
+ let revenue=Math.round(a.baseRevenue*m);
+ let total=clinics*revenue;
+
+ document.getElementById("view").innerHTML=`
+
+<div class="card">
+
+<h2>${a.name}</h2>
+
+<div class="section">
+<p><b>What it is:</b> ${a.what}</p>
+<p><b>How it works:</b> ${a.how}</p>
+<p><b>Why it matters:</b> ${a.why}</p>
+<p><b>Go-to-market:</b> ${a.gtm}</p>
+</div>
+
+<div class="section">
+<p><b>Projection Model</b></p>
+<p>Tier: ${t===3?"MVP":t===7?"Product":"Enterprise"}</p>
+<p>Facilities: ${clinics}</p>
+<p>Revenue per facility: $${revenue}</p>
+<p><b>Total Monthly Revenue: $${total.toLocaleString()}</b></p>
+</div>
+
+<div class="section">
+<p style="opacity:0.7">Development by Photon Bounce</p>
+</div>
+
+</div>
+
+`;
+}
+
+/* INIT */
+renderNav();
+render();
+
+</script>
+
+</body>
+</html>
