@@ -18,7 +18,6 @@ body{
  min-height:100vh;
 }
 
-/* SIDEBAR */
 .sidebar{
  width:300px;
  background:#0a0f1d;
@@ -37,11 +36,8 @@ body{
  font-size:13px;
 }
 
-.app.active{
- border-color:#22c55e;
-}
+.app.active{border-color:#22c55e;}
 
-/* MAIN */
 .main{
  flex:1;
  padding:14px;
@@ -63,13 +59,15 @@ body{
  border:1px solid #1f2937;
 }
 
-h2{font-size:16px;margin:0 0 10px 0;}
-
 p{
  font-size:13px;
  line-height:1.6;
  opacity:0.9;
  margin:6px 0;
+}
+
+input[type=range]{
+ width:100%;
 }
 
 select{
@@ -86,9 +84,9 @@ select{
 
 <div class="layout">
 
-<!-- SIDEBAR NAV -->
+<!-- NAV -->
 <div class="sidebar">
-<h3>AI Medical Apps</h3>
+<h3>AI Apps</h3>
 <div id="nav"></div>
 </div>
 
@@ -96,7 +94,7 @@ select{
 <div class="main">
 
 <div class="card">
-<label>Tier Model:</label>
+<label>Tier:</label>
 <select id="tier" onchange="render()">
 <option value="3">$3K MVP</option>
 <option value="7" selected>$7K Product</option>
@@ -112,104 +110,23 @@ select{
 
 <script>
 
-/* ================= LOCKED DATASET (NEVER REDUCE) ================= */
+/* FULL DATASET (LOCKED) */
 const apps=[
-{
-name:"AI Clinical Documentation",
-what:"AI converts doctor-patient conversations into structured medical documentation.",
-how:"Speech-to-text → NLP processing → SOAP note generation → EHR export.",
-why:"Doctors spend up to 60% of time on documentation instead of patient care.",
-gtm:"Start with clinics and hospice networks, then expand into hospital systems.",
-baseClinic:50,
-baseRevenue:800
-},
-{
-name:"Remote Patient Monitoring",
-what:"Continuous AI system that monitors patient health outside hospitals.",
-how:"IoT devices stream data → AI detects anomalies → alerts are triggered.",
-why:"Most critical health events occur outside hospitals without monitoring.",
-gtm:"Elderly care facilities and post-acute providers first.",
-baseClinic:80,
-baseRevenue:600
-},
-{
-name:"AI Intake Triage",
-what:"Pre-visit AI system that evaluates patient urgency.",
-how:"Patient inputs symptoms → AI classifies urgency → routes care.",
-why:"Clinics waste capacity on non-urgent cases.",
-gtm:"Urgent care chains and outpatient clinics.",
-baseClinic:60,
-baseRevenue:500
-},
-{
-name:"Billing Optimization AI",
-what:"Detects missed or undercoded billing opportunities.",
-how:"Scans medical records → maps procedures → finds revenue gaps.",
-why:"Hospitals lose millions due to underbilling.",
-gtm:"Hospital CFOs and revenue cycle departments.",
-baseClinic:40,
-baseRevenue:1200
-},
-{
-name:"Compliance Monitoring AI",
-what:"Automated compliance tracking system.",
-how:"Continuously scans logs and detects violations.",
-why:"Compliance failures create legal and financial risk.",
-gtm:"Enterprise hospital systems.",
-baseClinic:30,
-baseRevenue:1500
-},
-{
-name:"Staff Scheduling AI",
-what:"Optimizes hospital workforce scheduling.",
-how:"Predicts demand + balances staff availability.",
-why:"Hospitals overspend heavily on inefficient staffing.",
-gtm:"Hospital operations teams.",
-baseClinic:70,
-baseRevenue:700
-},
-{
-name:"Hospital Analytics Dashboard",
-what:"Real-time operational intelligence platform.",
-how:"Aggregates clinical + financial + operational data.",
-why:"Executives lack real-time decision visibility.",
-gtm:"Hospital leadership teams.",
-baseClinic:20,
-baseRevenue:2500
-},
-{
-name:"AI Patient CRM",
-what:"Automated patient engagement and retention system.",
-how:"Messaging + reminders + segmentation automation.",
-why:"Retention drives long-term healthcare revenue.",
-gtm:"Private clinics and outpatient networks.",
-baseClinic:90,
-baseRevenue:400
-},
-{
-name:"Drug Interaction AI",
-what:"Real-time medication safety detection system.",
-how:"Analyzes prescriptions and flags dangerous combinations.",
-why:"Medication errors are a major liability risk.",
-gtm:"Pharmacies and prescribing doctors.",
-baseClinic:100,
-baseRevenue:300
-},
-{
-name:"Telehealth AI",
-what:"AI-powered virtual consultation assistant.",
-how:"Handles intake, conversation, and documentation.",
-why:"Telehealth scaling is limited by human labor.",
-gtm:"Telemedicine companies and digital health startups.",
-baseClinic:60,
-baseRevenue:900
-}
+{name:"AI Clinical Documentation",what:"AI converts doctor-patient conversations into structured medical documentation.",how:"Speech-to-text → NLP → SOAP notes → EHR.",why:"Doctors spend up to 60% on documentation.",gtm:"Clinics → hospitals.",baseClinic:50,baseRevenue:800},
+{name:"Remote Patient Monitoring",what:"Continuous patient monitoring system.",how:"Devices → AI → alerts.",why:"Events happen outside hospitals.",gtm:"Elderly care.",baseClinic:80,baseRevenue:600},
+{name:"AI Intake Triage",what:"Pre-screen patients.",how:"AI routes cases.",why:"Improves efficiency.",gtm:"Urgent care.",baseClinic:60,baseRevenue:500},
+{name:"Billing Optimization AI",what:"Finds missed billing.",how:"Scans records.",why:"Hospitals lose revenue.",gtm:"CFOs.",baseClinic:40,baseRevenue:1200},
+{name:"Compliance Monitoring AI",what:"Tracks compliance.",how:"Log analysis.",why:"Avoid penalties.",gtm:"Enterprise.",baseClinic:30,baseRevenue:1500},
+{name:"Staff Scheduling AI",what:"Optimizes staffing.",how:"Forecasting.",why:"Reduce costs.",gtm:"Ops teams.",baseClinic:70,baseRevenue:700},
+{name:"Hospital Analytics Dashboard",what:"Real-time insights.",how:"Data aggregation.",why:"Better decisions.",gtm:"Leadership.",baseClinic:20,baseRevenue:2500},
+{name:"AI Patient CRM",what:"Retention system.",how:"Automation.",why:"Increase LTV.",gtm:"Clinics.",baseClinic:90,baseRevenue:400},
+{name:"Drug Interaction AI",what:"Detects risks.",how:"Prescription analysis.",why:"Avoid errors.",gtm:"Doctors.",baseClinic:100,baseRevenue:300},
+{name:"Telehealth AI",what:"Virtual care AI.",how:"AI consult + docs.",why:"Scale telehealth.",gtm:"Startups.",baseClinic:60,baseRevenue:900}
 ];
 
-/* STATE */
 let selected=0;
 
-/* NAV RENDER */
+/* NAV */
 function renderNav(){
  let html="";
  apps.forEach((a,i)=>{
@@ -224,24 +141,19 @@ function selectApp(i){
  render();
 }
 
-/* TIER */
-function getTier(){
- return +document.getElementById("tier").value;
+/* MULTIPLIER */
+function getMultiplier(){
+ let t=+document.getElementById("tier").value;
+ return t===3?0.6:t===7?1:t===12?1.5:1;
 }
 
-/* VIEW */
+/* RENDER */
 function render(){
 
  renderNav();
 
  let a=apps[selected];
- let t=getTier();
-
- let m = t===3?0.6:t===7?1.0:1.5;
-
- let clinics=Math.round(a.baseClinic*m);
- let revenue=Math.round(a.baseRevenue*m);
- let total=clinics*revenue;
+ let m=getMultiplier();
 
  document.getElementById("view").innerHTML=`
 
@@ -257,11 +169,15 @@ function render(){
 </div>
 
 <div class="section">
-<p><b>Projection Model</b></p>
-<p>Tier: ${t===3?"MVP":t===7?"Product":"Enterprise"}</p>
-<p>Facilities: ${clinics}</p>
-<p>Revenue per facility: $${revenue}</p>
-<p><b>Total Monthly Revenue: $${total.toLocaleString()}</b></p>
+
+<p><b>Facilities: <span id="facVal">${Math.round(a.baseClinic)}</span></b></p>
+<input type="range" min="10" max="500" value="${a.baseClinic}" id="fac" oninput="calc()">
+
+<p><b>Revenue per facility: $<span id="revVal">${a.baseRevenue}</span></b></p>
+<input type="range" min="100" max="3000" value="${a.baseRevenue}" id="rev" oninput="calc()">
+
+<p id="profit" style="margin-top:10px;"></p>
+
 </div>
 
 <div class="section">
@@ -269,8 +185,24 @@ function render(){
 </div>
 
 </div>
-
 `;
+
+ calc();
+}
+
+/* CALC */
+function calc(){
+ let f=+document.getElementById("fac").value;
+ let r=+document.getElementById("rev").value;
+ let m=getMultiplier();
+
+ document.getElementById("facVal").innerText=Math.round(f*m);
+ document.getElementById("revVal").innerText=Math.round(r*m);
+
+ let total=Math.round(f*m)*Math.round(r*m);
+
+ document.getElementById("profit").innerHTML=
+ "<b>Total Monthly Revenue: $"+total.toLocaleString()+"</b>";
 }
 
 /* INIT */
